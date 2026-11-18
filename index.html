@@ -141,7 +141,7 @@ footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem;bord
 .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,180,255,.3);border:none;color:#fff;font-size:2.5rem;width:48px;height:48px;border-radius:50%;cursor:pointer}
 .lb-prev{left:1rem}.lb-next{right:1rem}
 .lb-prev:hover,.lb-next:hover{background:var(--blue)}
-#fbLoading{position:fixed;inset:0;background:rgba(10,22,40,.9);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#00b4ff;font-size:1.2rem}
+#fbLoading{position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:9000;display:none;flex-direction:column;align-items:center;justify-content:center;color:#00b4ff;font-size:1.2rem;pointer-events:none}
 .spinner{width:40px;height:40px;border:3px solid rgba(0,180,255,.3);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:1rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:768px){
@@ -646,7 +646,16 @@ let editingProdId = null;
 let lbIndex = 0;
 let slideTimers = [];
 
-function showLoading(on){document.getElementById("fbLoading").style.display=on?"flex":"none"}
+function showLoading(on){
+  var el = document.getElementById("fbLoading");
+  if (!el) return;
+  // No tapar la portada/splash de inicio
+  if (on) {
+    var splash = document.getElementById("appSplash");
+    if (splash && !splash.classList.contains("hide")) { el.style.display = "none"; return; }
+  }
+  el.style.display = on ? "flex" : "none";
+}
 
 
 /** Sube dataURL a Storage con timeout; si falla, devuelve "" */
@@ -1544,7 +1553,6 @@ async function savePass(){
 }
 
 document.addEventListener("DOMContentLoaded",async()=>{
-  showLoading(true);
   try{await loadData();renderGallery();renderProducts();updateCartCount()}
   catch(e){console.error(e);alert("Error Firebase: "+e.message+". Crea Realtime Database y revisa las reglas.")}
   showLoading(false);
